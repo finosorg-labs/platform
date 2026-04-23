@@ -1,5 +1,11 @@
-# Build directories
-build/
+# Build directories - only keep library files (.a/.so/.dylib/.lib/.dll)
+build/**
+!build/**/
+!build/**/*.a
+!build/**/*.so
+!build/**/*.dylib
+!build/**/*.lib
+!build/**/*.dll
 build-*/
 install/
 
@@ -8,14 +14,6 @@ go.sum
 *.test
 *.out
 *.prof
-
-# C/C++
-*.o
-*.a
-*.so
-*.dylib
-*.dll
-*.exe
 
 # IDE
 .vscode/
