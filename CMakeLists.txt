@@ -4,8 +4,15 @@ project(finkit-platform VERSION 1.0.0 LANGUAGES C)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
-# 编译选项
+# Compiler options
 add_compile_options(-Wall -Wextra -Wpedantic -ffp-contract=off)
+
+# Sanitizer configuration
+if(FC_ENABLE_SANITIZERS)
+    if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/.github/sanitizers.cmake)
+        include(${CMAKE_CURRENT_SOURCE_DIR}/.github/sanitizers.cmake)
+    endif()
+endif()
 
 # Platform-specific sources (selected by TARGET OS, not host OS)
 set(PLATFORM_SOURCES
@@ -23,7 +30,7 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     list(APPEND PLATFORM_SOURCES src/platform_linux.c)
 endif()
 
-# 创建对象库
+# Create object library
 add_library(finkit_platform OBJECT ${PLATFORM_SOURCES})
 
 target_include_directories(finkit_platform
@@ -34,7 +41,7 @@ target_include_directories(finkit_platform
 
 target_compile_definitions(finkit_platform PRIVATE FC_STATIC_BUILD)
 
-# 创建静态库
+# Create static library
 add_library(finkit_platform_static STATIC $<TARGET_OBJECTS:finkit_platform>)
 target_include_directories(finkit_platform_static
     PUBLIC
@@ -42,13 +49,13 @@ target_include_directories(finkit_platform_static
         $<INSTALL_INTERFACE:include>
 )
 
-# 链接数学库
+# Link math library
 target_link_libraries(finkit_platform_static PUBLIC m)
 
-# 创建别名
+# Create alias
 add_library(finkit::platform ALIAS finkit_platform_static)
 
-# 安装
+# Install
 install(TARGETS finkit_platform_static
     EXPORT finkit-platform-targets
     ARCHIVE DESTINATION lib
@@ -65,7 +72,7 @@ install(EXPORT finkit-platform-targets
     DESTINATION lib/cmake/finkit-platform
 )
 
-# 配置文件
+# Configuration files
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
     "${CMAKE_CURRENT_BINARY_DIR}/finkit-platformConfigVersion.cmake"
@@ -85,14 +92,14 @@ install(FILES
     DESTINATION lib/cmake/finkit-platform
 )
 
-# 测试
+# Testing
 option(BUILD_TESTING "Build tests" ON)
 if(BUILD_TESTING AND EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/tests)
     enable_testing()
     # add_subdirectory(tests)
 endif()
 
-# 打印配置
+# Print configuration
 message(STATUS "")
 message(STATUS "============================================================")
 message(STATUS " finkit-platform ${PROJECT_VERSION}")
