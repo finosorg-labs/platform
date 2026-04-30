@@ -484,6 +484,60 @@ FC_API size_t fc_get_l2_cache_size(void);
  */
 FC_API size_t fc_get_l3_cache_size(void);
 
+/**
+ * @brief Initialize the library
+ *
+ * Performs one-time initialization including SIMD capability detection.
+ * Safe to call multiple times (subsequent calls are no-ops).
+ * Must be called before using any library functions.
+ *
+ * @return FC_OK on success, FC_ERR_ILLEGAL_STATE on failure
+ */
+FC_API int fc_init(void);
+
+/**
+ * @brief Clean up library resources
+ *
+ * Resets initialization state. After calling this, fc_init() must be
+ * called again before using library functions.
+ */
+FC_API void fc_cleanup(void);
+
+/**
+ * @brief Get library version as packed integer
+ *
+ * @return Version as (major << 16) | (minor << 8) | patch
+ */
+FC_API int fc_version(void);
+
+/**
+ * @brief Get library major version number
+ *
+ * @return Major version number
+ */
+FC_API int fc_version_major(void);
+
+/**
+ * @brief Get library minor version number
+ *
+ * @return Minor version number
+ */
+FC_API int fc_version_minor(void);
+
+/**
+ * @brief Get library patch version number
+ *
+ * @return Patch version number
+ */
+FC_API int fc_version_patch(void);
+
+/**
+ * @brief Get library version as string
+ *
+ * @return Version string (e.g., "1.0.0")
+ */
+FC_API const char* fc_version_string(void);
+
 FC_END_DECLS
 
 /*
