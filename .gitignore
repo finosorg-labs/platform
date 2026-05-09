@@ -9,6 +9,14 @@ build/**
 build-*/
 install/
 
+# third-party
+third_party/**
+!third_party/**/
+!third_party/**/.libs/*.a
+!third_party/**/.libs/lib*.dylib
+!third_party/**/.libs/lib*.lib
+!third_party/**/.libs/lib*.dll
+
 # Go
 *.test
 *.out
