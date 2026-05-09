@@ -53,6 +53,14 @@ static const fc_error_info_t g_error_table[] = {
     {"Function not implemented",         2, 0},
     /* FC_ERR_ASSERTION_FAILED    */
     {"Assertion failed",                 5, 1},
+    /* FC_ERR_DIVIDE_BY_ZERO      */
+    {"Division by zero",                 3, 0},
+    /* FC_ERR_UNDERFLOW           */
+    {"Numeric underflow",                2, 0},
+    /* FC_ERR_PARSE               */
+    {"Parse error",                      2, 0},
+    /* FC_ERR_INTERNAL            */
+    {"Internal error",                   4, 1},
 };
 
 #define FC_ERROR_TABLE_SIZE (sizeof(g_error_table) / sizeof(g_error_table[0]))

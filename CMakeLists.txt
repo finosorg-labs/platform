@@ -37,6 +37,10 @@ set(PLATFORM_SOURCES
     src/mem_aligned.c
     src/error.c
     src/fc_init.c
+    src/fc_bignum_init.c
+    src/fc_bigint.c
+    src/fc_bigfloat.c
+    src/fc_precision.c
 )
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
@@ -47,6 +51,9 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     list(APPEND PLATFORM_SOURCES src/platform_linux.c)
 endif()
 
+set(FC_GMP_STATIC_LIB ${CMAKE_CURRENT_SOURCE_DIR}/third_party/gmp/.libs/libgmp.a)
+set(FC_MPFR_STATIC_LIB ${CMAKE_CURRENT_SOURCE_DIR}/third_party/mpfr/src/.libs/libmpfr.a)
+
 # Create object library
 add_library(finkit_platform OBJECT ${PLATFORM_SOURCES})
 
@@ -54,6 +61,10 @@ target_include_directories(finkit_platform
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+        ${CMAKE_CURRENT_SOURCE_DIR}/third_party/gmp
+        ${CMAKE_CURRENT_SOURCE_DIR}/third_party/mpfr/src
 )
 
 target_compile_definitions(finkit_platform PRIVATE FC_STATIC_BUILD)
@@ -66,8 +77,13 @@ target_include_directories(finkit_platform_static
         $<INSTALL_INTERFACE:include>
 )
 
-# Link math library
-target_link_libraries(finkit_platform_static PUBLIC m)
+# Link third-party and math libraries
+target_link_libraries(finkit_platform_static
+    PUBLIC
+        m
+        ${FC_MPFR_STATIC_LIB}
+        ${FC_GMP_STATIC_LIB}
+)
 
 # Create alias
 add_library(finkit::platform ALIAS finkit_platform_static)

@@ -38,6 +38,10 @@ typedef enum {
     FC_ERR_ILLEGAL_STATE       = -13, /**< Illegal state */
     FC_ERR_NOT_IMPLEMENTED     = -14, /**< Function not implemented */
     FC_ERR_ASSERTION_FAILED    = -15, /**< Assertion failed (debug mode only) */
+    FC_ERR_DIVIDE_BY_ZERO      = -16, /**< Division by zero */
+    FC_ERR_UNDERFLOW           = -17, /**< Numeric underflow */
+    FC_ERR_PARSE               = -18, /**< Parse error */
+    FC_ERR_INTERNAL            = -19, /**< Internal error */
 } fc_status_t;
 
 /**

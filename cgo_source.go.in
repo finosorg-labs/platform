@@ -7,19 +7,26 @@
 package platform
 
 /*
-#cgo CFLAGS: -I${SRCDIR}/include -I${SRCDIR}/src -O2 -Wall -std=c11 -D_POSIX_C_SOURCE=200112L @FC_SIMD_CFLAGS@
-#cgo LDFLAGS: -lm
+#cgo CFLAGS: -I${SRCDIR}/include -I${SRCDIR}/src -I${SRCDIR}/third_party/gmp -I${SRCDIR}/third_party/mpfr/src -O2 -Wall -std=c11 -D_POSIX_C_SOURCE=200112L @FC_SIMD_CFLAGS@
+#cgo LDFLAGS: ${SRCDIR}/third_party/mpfr/src/.libs/libmpfr.a ${SRCDIR}/third_party/gmp/.libs/libgmp.a -lm
 
 #include "platform.h"
 #include "simd_detect.h"
 #include "mem_aligned.h"
 #include "error.h"
+#include "fc_bigint.h"
+#include "fc_bigfloat.h"
+#include "fc_precision.h"
 
 // Platform sources
 #include "simd_detect.c"
 #include "mem_aligned.c"
 #include "error.c"
 #include "fc_init.c"
+#include "fc_bignum_init.c"
+#include "fc_bigint.c"
+#include "fc_bigfloat.c"
+#include "fc_precision.c"
 
 // Platform-specific sources
 #if defined(__linux__)

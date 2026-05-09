@@ -4,6 +4,7 @@
  */
 
 #include "error.h"
+#include "fc_bignum_internal.h"
 #include "platform.h"
 #include "simd_detect.h"
 
@@ -29,11 +30,17 @@ int fc_init(void) {
         return FC_ERR_ILLEGAL_STATE;
     }
 
+    if (fc_bignum_global_init() != FC_OK) {
+        atomic_store(&g_fc_initialized, 0);
+        return FC_ERR_ILLEGAL_STATE;
+    }
+
     /* Platform initialization complete */
     return FC_OK;
 }
 
 void fc_cleanup(void) {
+    fc_bignum_global_cleanup();
     atomic_store(&g_fc_initialized, 0);
 }
 

@@ -162,6 +162,10 @@ const (
 	StatusIllegalState      Status = C.FC_ERR_ILLEGAL_STATE
 	StatusNotImplemented    Status = C.FC_ERR_NOT_IMPLEMENTED
 	StatusAssertionFailed   Status = C.FC_ERR_ASSERTION_FAILED
+	StatusDivideByZero      Status = C.FC_ERR_DIVIDE_BY_ZERO
+	StatusUnderflow         Status = C.FC_ERR_UNDERFLOW
+	StatusParse             Status = C.FC_ERR_PARSE
+	StatusInternal          Status = C.FC_ERR_INTERNAL
 
 	// Aliases for backward compatibility
 	StatusError         = StatusInvalidArg
