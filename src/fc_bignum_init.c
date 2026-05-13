@@ -19,10 +19,10 @@ static atomic_int g_fc_bignum_initialized = 0;
 /**
  * @brief Custom allocator for GMP/MPFR
  *
- * Uses standard malloc to keep memory management simple and portable.
+ * Uses calloc to zero-initialize memory for MemorySanitizer compatibility.
  */
 static void* fc_bignum_alloc(size_t size) {
-    return malloc(size);
+    return calloc(1, size);
 }
 
 /**

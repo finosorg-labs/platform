@@ -7,11 +7,11 @@ package platform
 
 /*
 #cgo CFLAGS: -I${SRCDIR}/include
-#cgo linux,amd64   LDFLAGS: -L${SRCDIR}/build/linux_amd64 -lfinkit_platform_static ${SRCDIR}/third_party/mpfr/src/.libs/libmpfr.a ${SRCDIR}/third_party/gmp/.libs/libgmp.a -lm
-#cgo linux,arm64   LDFLAGS: -L${SRCDIR}/build/linux_arm64 -lfinkit_platform_static ${SRCDIR}/third_party/mpfr/src/.libs/libmpfr.a ${SRCDIR}/third_party/gmp/.libs/libgmp.a -lm
-#cgo darwin,amd64  LDFLAGS: -L${SRCDIR}/build/darwin_amd64 -lfinkit_platform_static ${SRCDIR}/third_party/mpfr/src/.libs/libmpfr.a ${SRCDIR}/third_party/gmp/.libs/libgmp.a -lm
-#cgo darwin,arm64  LDFLAGS: -L${SRCDIR}/build/darwin_arm64 -lfinkit_platform_static ${SRCDIR}/third_party/mpfr/src/.libs/libmpfr.a ${SRCDIR}/third_party/gmp/.libs/libgmp.a -lm
-#cgo windows,amd64 LDFLAGS: -L${SRCDIR}/build/windows_amd64 -lfinkit_platform_static ${SRCDIR}/third_party/mpfr/src/.libs/libmpfr.a ${SRCDIR}/third_party/gmp/.libs/libgmp.a -lm
+#cgo linux,amd64   LDFLAGS: -L${SRCDIR}/build/linux_amd64 -lfinkit_platform_static ${SRCDIR}/build/linux_amd64/third_party/mpfr/libmpfr.a ${SRCDIR}/build/linux_amd64/third_party/gmp/libgmp.a -lm
+#cgo linux,arm64   LDFLAGS: -L${SRCDIR}/build/linux_arm64 -lfinkit_platform_static ${SRCDIR}/build/linux_arm64/third_party/mpfr/libmpfr.a ${SRCDIR}/build/linux_arm64/third_party/gmp/libgmp.a -lm
+#cgo darwin,amd64  LDFLAGS: -L${SRCDIR}/build/darwin_amd64 -lfinkit_platform_static ${SRCDIR}/build/darwin_amd64/third_party/mpfr/libmpfr.a ${SRCDIR}/build/darwin_amd64/third_party/gmp/libgmp.a -lm
+#cgo darwin,arm64  LDFLAGS: -L${SRCDIR}/build/darwin_arm64 -lfinkit_platform_static ${SRCDIR}/build/darwin_arm64/third_party/mpfr/libmpfr.a ${SRCDIR}/build/darwin_arm64/third_party/gmp/libgmp.a -lm
+#cgo windows,amd64 LDFLAGS: -L${SRCDIR}/build/windows_amd64 -lfinkit_platform_static ${SRCDIR}/build/windows_amd64/third_party/mpfr/libmpfr.a ${SRCDIR}/build/windows_amd64/third_party/gmp/libgmp.a -lm
 
 #include "platform.h"
 #include "simd_detect.h"

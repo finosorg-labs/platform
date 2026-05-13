@@ -28,7 +28,7 @@ FC_API fc_status_t fc_bigint_create(fc_bigint_t** value_out) {
         return FC_ERR_NOT_INITIALIZED;
     }
 
-    value = (fc_bigint_impl_t*) malloc(sizeof(*value));
+    value = (fc_bigint_impl_t*) calloc(1, sizeof(*value));
     if (value == FC_NULL) {
         return FC_ERR_OUT_OF_MEMORY;
     }

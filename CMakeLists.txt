@@ -51,8 +51,18 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     list(APPEND PLATFORM_SOURCES src/platform_linux.c)
 endif()
 
-set(FC_GMP_STATIC_LIB ${CMAKE_CURRENT_SOURCE_DIR}/third_party/gmp/.libs/libgmp.a)
-set(FC_MPFR_STATIC_LIB ${CMAKE_CURRENT_SOURCE_DIR}/third_party/mpfr/src/.libs/libmpfr.a)
+# Try to find third-party libraries in build directory first, then fall back to source directory
+if(EXISTS ${CMAKE_BINARY_DIR}/third_party/gmp/libgmp.a)
+    set(FC_GMP_STATIC_LIB ${CMAKE_BINARY_DIR}/third_party/gmp/libgmp.a)
+else()
+    set(FC_GMP_STATIC_LIB ${CMAKE_CURRENT_SOURCE_DIR}/third_party/gmp/.libs/libgmp.a)
+endif()
+
+if(EXISTS ${CMAKE_BINARY_DIR}/third_party/mpfr/libmpfr.a)
+    set(FC_MPFR_STATIC_LIB ${CMAKE_BINARY_DIR}/third_party/mpfr/libmpfr.a)
+else()
+    set(FC_MPFR_STATIC_LIB ${CMAKE_CURRENT_SOURCE_DIR}/third_party/mpfr/src/.libs/libmpfr.a)
+endif()
 
 # Create object library
 add_library(finkit_platform OBJECT ${PLATFORM_SOURCES})
@@ -65,6 +75,8 @@ target_include_directories(finkit_platform
         ${CMAKE_CURRENT_SOURCE_DIR}/src
         ${CMAKE_CURRENT_SOURCE_DIR}/third_party/gmp
         ${CMAKE_CURRENT_SOURCE_DIR}/third_party/mpfr/src
+        ${CMAKE_CURRENT_SOURCE_DIR}/third_party/gmp/.libs
+        ${CMAKE_CURRENT_SOURCE_DIR}/third_party/mpfr/src/.libs
 )
 
 target_compile_definitions(finkit_platform PRIVATE FC_STATIC_BUILD)

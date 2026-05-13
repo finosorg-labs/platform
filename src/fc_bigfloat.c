@@ -54,7 +54,7 @@ static fc_status_t fc_bigfloat_format_regular(
     char* buffer,
     fc_size_t buffer_size
 ) {
-    mpfr_exp_t exponent;
+    mpfr_exp_t exponent = 0;
     char* digits;
     char* magnitude;
     size_t digits_len;
@@ -139,7 +139,7 @@ FC_API fc_status_t fc_bigfloat_create_with_prec(fc_bigfloat_t** value_out, fc_ui
         return FC_ERR_NOT_INITIALIZED;
     }
 
-    value = (fc_bigfloat_impl_t*) malloc(sizeof(*value));
+    value = (fc_bigfloat_impl_t*) calloc(1, sizeof(*value));
     if (value == FC_NULL) {
         return FC_ERR_OUT_OF_MEMORY;
     }

@@ -41,9 +41,18 @@ WINDOWS_BUILD_DIR := build/windows_amd64
 LINUX_ARTIFACT_DIR    := $(LINUX_BUILD_DIR)
 WINDOWS_ARTIFACT_DIR  := $(WINDOWS_BUILD_DIR)
 
+# Third-party library source paths
+GMP_SOURCE_LIB    := third_party/gmp/.libs/libgmp.a
+MPFR_SOURCE_LIB   := third_party/mpfr/src/.libs/libmpfr.a
+
+# Third-party library target paths
+LINUX_THIRD_PARTY_DIR   := $(LINUX_BUILD_DIR)/third_party
+WINDOWS_THIRD_PARTY_DIR := $(WINDOWS_BUILD_DIR)/third_party
+
 .PHONY: all default linux windows go test bench clean verify help format
 .PHONY: qa qa-sanitizers qa-static
 .PHONY: sanitizer-asan sanitizer-usan sanitizer-tsan sanitizer-msan clang-tidy cppcheck
+.PHONY: copy-third-party-linux copy-third-party-windows
 
 default: linux
 
@@ -60,14 +69,48 @@ qa-static: clang-tidy cppcheck
 qa-sanitizers: sanitizer-asan sanitizer-usan sanitizer-tsan sanitizer-msan
 	@echo "==> All sanitizer checks completed"
 
-linux:
+copy-third-party-linux:
+	@echo "==> Copying third-party libraries for Linux"
+	@mkdir -p $(LINUX_THIRD_PARTY_DIR)/gmp
+	@mkdir -p $(LINUX_THIRD_PARTY_DIR)/mpfr
+	@if [ -f $(GMP_SOURCE_LIB) ]; then \
+		cp $(GMP_SOURCE_LIB) $(LINUX_THIRD_PARTY_DIR)/gmp/; \
+		echo "  Copied GMP library to $(LINUX_THIRD_PARTY_DIR)/gmp/"; \
+	else \
+		echo "  WARNING: GMP library not found at $(GMP_SOURCE_LIB)"; \
+	fi
+	@if [ -f $(MPFR_SOURCE_LIB) ]; then \
+		cp $(MPFR_SOURCE_LIB) $(LINUX_THIRD_PARTY_DIR)/mpfr/; \
+		echo "  Copied MPFR library to $(LINUX_THIRD_PARTY_DIR)/mpfr/"; \
+	else \
+		echo "  WARNING: MPFR library not found at $(MPFR_SOURCE_LIB)"; \
+	fi
+
+copy-third-party-windows:
+	@echo "==> Copying third-party libraries for Windows"
+	@mkdir -p $(WINDOWS_THIRD_PARTY_DIR)/gmp
+	@mkdir -p $(WINDOWS_THIRD_PARTY_DIR)/mpfr
+	@if [ -f $(GMP_SOURCE_LIB) ]; then \
+		cp $(GMP_SOURCE_LIB) $(WINDOWS_THIRD_PARTY_DIR)/gmp/; \
+		echo "  Copied GMP library to $(WINDOWS_THIRD_PARTY_DIR)/gmp/"; \
+	else \
+		echo "  WARNING: GMP library not found at $(GMP_SOURCE_LIB)"; \
+	fi
+	@if [ -f $(MPFR_SOURCE_LIB) ]; then \
+		cp $(MPFR_SOURCE_LIB) $(WINDOWS_THIRD_PARTY_DIR)/mpfr/; \
+		echo "  Copied MPFR library to $(WINDOWS_THIRD_PARTY_DIR)/mpfr/"; \
+	else \
+		echo "  WARNING: MPFR library not found at $(MPFR_SOURCE_LIB)"; \
+	fi
+
+linux: copy-third-party-linux
 	@echo "==> Building Linux (native, $(BUILD_TYPE))"
 	@$(CMAKE) -B $(LINUX_BUILD_DIR) \
 		-G Ninja \
 		-DCMAKE_BUILD_TYPE=$(BUILD_TYPE)
 	@$(CMAKE) --build $(LINUX_BUILD_DIR) --parallel
 
-windows:
+windows: copy-third-party-windows
 	@echo "==> Building Windows amd64 (cross-compile, $(BUILD_TYPE))"
 	@$(CMAKE) -B $(WINDOWS_BUILD_DIR) \
 		-G Ninja \
