@@ -7,7 +7,9 @@
 package platform
 
 /*
-#cgo CFLAGS: -I${SRCDIR}/include -I${SRCDIR}/src -I${SRCDIR}/third_party/gmp -I${SRCDIR}/third_party/mpfr/src -O2 -Wall -std=c11 -D_POSIX_C_SOURCE=200112L -mavx2 -mfma
+#cgo CFLAGS: -I${SRCDIR}/include -I${SRCDIR}/src -I${SRCDIR}/third_party/gmp -I${SRCDIR}/third_party/mpfr/src -O2 -Wall -std=c11
+#cgo darwin CFLAGS: -D_DARWIN_C_SOURCE
+#cgo linux CFLAGS: -D_POSIX_C_SOURCE=200112L
 #cgo LDFLAGS: ${SRCDIR}/third_party/mpfr/src/.libs/libmpfr.a ${SRCDIR}/third_party/gmp/.libs/libgmp.a -lm
 
 #include "platform.h"

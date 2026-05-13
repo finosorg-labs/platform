@@ -19,7 +19,7 @@ fc_simd_level_t g_fc_simd_level = FC_SIMD_SCALAR;
  * Platform-specific CPUID detection implementation
  */
 
-#if defined(FC_ARCH_X86) || defined(FC_ARCH_X86_64)
+#if FC_ARCH_X86 || FC_ARCH_X86_64
 
 /* x86/x86_64 platform: using inline assembly or intrinsics */
 
@@ -56,7 +56,7 @@ static inline int fc_has_bit(uint32_t reg, int bit) {
     return (reg & (1U << bit)) != 0;
 }
 
-#elif defined(FC_ARCH_ARM) || defined(FC_ARCH_ARM64)
+#elif FC_ARCH_ARM || FC_ARCH_ARM64
 
 /* ARM platform: detect NEON support */
 #    if FC_OS_LINUX
@@ -91,7 +91,7 @@ static inline int fc_detect_arm_neon(void) {
  * x86/x86_64 SIMD detection
  */
 
-#if defined(FC_ARCH_X86) || defined(FC_ARCH_X86_64)
+#if FC_ARCH_X86 || FC_ARCH_X86_64
 
 static fc_simd_level_t fc_detect_simd_x86(void) {
     uint32_t regs[4]               = {0};
@@ -153,7 +153,7 @@ static fc_simd_level_t fc_detect_simd_x86(void) {
     return FC_SIMD_AVX2;
 }
 
-#elif defined(FC_ARCH_ARM) || defined(FC_ARCH_ARM64)
+#elif FC_ARCH_ARM || FC_ARCH_ARM64
 
 static fc_simd_level_t fc_detect_simd_arm(void) {
     if (fc_detect_arm_neon()) {
@@ -175,9 +175,9 @@ static fc_simd_level_t fc_detect_simd_generic(void) {
  */
 
 fc_simd_level_t fc_detect_simd(void) {
-#if defined(FC_ARCH_X86) || defined(FC_ARCH_X86_64)
+#if FC_ARCH_X86 || FC_ARCH_X86_64
     g_fc_simd_level = fc_detect_simd_x86();
-#elif defined(FC_ARCH_ARM) || defined(FC_ARCH_ARM64)
+#elif FC_ARCH_ARM || FC_ARCH_ARM64
     g_fc_simd_level = fc_detect_simd_arm();
 #else
     g_fc_simd_level = fc_detect_simd_generic();
@@ -225,9 +225,9 @@ size_t fc_simd_parallelism(fc_simd_level_t level) {
 
 /* Private: detection without global side effect (safe for Go runtime init) */
 fc_simd_level_t fc_simd_detect_unsafe(void) {
-#if defined(FC_ARCH_X86) || defined(FC_ARCH_X86_64)
+#if FC_ARCH_X86 || FC_ARCH_X86_64
     return fc_detect_simd_x86();
-#elif defined(FC_ARCH_ARM) || defined(FC_ARCH_ARM64)
+#elif FC_ARCH_ARM || FC_ARCH_ARM64
     return fc_detect_simd_arm();
 #else
     return FC_SIMD_SCALAR;

@@ -7,6 +7,7 @@
 
 #include "platform.h"
 
+#include <sys/types.h>
 #include <sys/sysctl.h>
 
 /*
@@ -20,6 +21,9 @@
 #define FC_CACHE_L2_ARM_DEFAULT   (4 * 1024 * 1024ULL)
 #define FC_CACHE_L3_ARM_DEFAULT   (16 * 1024 * 1024ULL)
 #define FC_CACHE_LINE_DEFAULT     64
+
+/* These functions are only used on x86/x86_64, not on ARM64 */
+#if !FC_ARCH_ARM64
 
 static size_t fc_sysctl_cache_size(const int* name, size_t default_size) {
     size_t size = default_size;
@@ -45,6 +49,8 @@ static size_t fc_sysctl_cache_line_size(const int* name, size_t default_size) {
     }
     return default_size;
 }
+
+#endif /* !FC_ARCH_ARM64 */
 
 size_t fc_get_cache_line_size(void) {
 #if defined(FC_ARCH_ARM64)

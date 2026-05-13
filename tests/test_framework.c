@@ -350,11 +350,17 @@ int fc_test_generate_coverage_report(void) {
     printf("Generating coverage report...\n");
     printf("============================================================\n");
 
-    /* Flush coverage data - use weak symbol to avoid link errors */
-    void __gcov_flush(void) __attribute__((weak));
+    /* Flush coverage data if coverage instrumentation is enabled */
+#if defined(__GNUC__) && !defined(__clang__)
+    /* Only available with GCC coverage instrumentation */
+    extern void __gcov_flush(void) __attribute__((weak));
     if (__gcov_flush) {
         __gcov_flush();
     }
+#elif defined(__clang__)
+    /* Clang uses different coverage mechanism, no flush needed */
+    printf("Note: Using Clang - coverage data will be written at program exit.\n");
+#endif
 
     /* Run gcov on source files */
     int ret = system("gcov -r src/matrix/*.c 2>/dev/null | grep -A 3 '\\.c' || true");

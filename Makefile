@@ -35,11 +35,17 @@ BUILD_TYPE ?= Release
 CMAKE ?= cmake
 TOOLCHAIN_DIR := cmake/toolchain
 
+# Platform detection
+UNAME_S := $(shell uname -s)
+UNAME_M := $(shell uname -m)
+
 LINUX_BUILD_DIR  := build/linux_amd64
 WINDOWS_BUILD_DIR := build/windows_amd64
+MACOS_BUILD_DIR := build/darwin_arm64
 
 LINUX_ARTIFACT_DIR    := $(LINUX_BUILD_DIR)
 WINDOWS_ARTIFACT_DIR  := $(WINDOWS_BUILD_DIR)
+MACOS_ARTIFACT_DIR  := $(MACOS_BUILD_DIR)
 
 # Third-party library source paths
 GMP_SOURCE_LIB    := third_party/gmp/.libs/libgmp.a
@@ -48,15 +54,16 @@ MPFR_SOURCE_LIB   := third_party/mpfr/src/.libs/libmpfr.a
 # Third-party library target paths
 LINUX_THIRD_PARTY_DIR   := $(LINUX_BUILD_DIR)/third_party
 WINDOWS_THIRD_PARTY_DIR := $(WINDOWS_BUILD_DIR)/third_party
+MACOS_THIRD_PARTY_DIR := $(MACOS_BUILD_DIR)/third_party
 
-.PHONY: all default linux windows go test bench clean verify help format
+.PHONY: all default linux windows macos go test bench clean verify help format
 .PHONY: qa qa-sanitizers qa-static
 .PHONY: sanitizer-asan sanitizer-usan sanitizer-tsan sanitizer-msan clang-tidy cppcheck
-.PHONY: copy-third-party-linux copy-third-party-windows
+.PHONY: copy-third-party-linux copy-third-party-windows copy-third-party-macos
 
-default: linux
+default: macos
 
-all: format linux go
+all: format linux windows macos go
 # TODO: Re-enable Windows build after building Windows-compatible GMP/MPFR libraries
 # all: format linux windows go
 
@@ -66,8 +73,19 @@ qa: format qa-static qa-sanitizers
 qa-static: clang-tidy cppcheck
 	@echo "==> All static analysis checks completed"
 
+# MemorySanitizer is not supported on macOS ARM64
+ifeq ($(UNAME_S),Darwin)
+ifeq ($(UNAME_M),arm64)
+qa-sanitizers: sanitizer-asan sanitizer-usan sanitizer-tsan
+	@echo "==> All sanitizer checks completed (MSan skipped on macOS ARM64)"
+else
 qa-sanitizers: sanitizer-asan sanitizer-usan sanitizer-tsan sanitizer-msan
 	@echo "==> All sanitizer checks completed"
+endif
+else
+qa-sanitizers: sanitizer-asan sanitizer-usan sanitizer-tsan sanitizer-msan
+	@echo "==> All sanitizer checks completed"
+endif
 
 copy-third-party-linux:
 	@echo "==> Copying third-party libraries for Linux"
@@ -103,6 +121,23 @@ copy-third-party-windows:
 		echo "  WARNING: MPFR library not found at $(MPFR_SOURCE_LIB)"; \
 	fi
 
+copy-third-party-macos:
+	@echo "==> Copying third-party libraries for macos"
+	@mkdir -p $(MACOS_THIRD_PARTY_DIR)/gmp
+	@mkdir -p $(MACOS_THIRD_PARTY_DIR)/mpfr
+	@if [ -f $(GMP_SOURCE_LIB) ]; then \
+		cp $(GMP_SOURCE_LIB) $(MACOS_THIRD_PARTY_DIR)/gmp/; \
+		echo "  Copied GMP library to $(MACOS_THIRD_PARTY_DIR)/gmp/"; \
+	else \
+		echo "  WARNING: GMP library not found at $(GMP_SOURCE_LIB)"; \
+	fi
+	@if [ -f $(MPFR_SOURCE_LIB) ]; then \
+		cp $(MPFR_SOURCE_LIB) $(MACOS_THIRD_PARTY_DIR)/mpfr/; \
+		echo "  Copied MPFR library to $(MACOS_THIRD_PARTY_DIR)/mpfr/"; \
+	else \
+		echo "  WARNING: MPFR library not found at $(MPFR_SOURCE_LIB)"; \
+	fi
+
 linux: copy-third-party-linux
 	@echo "==> Building Linux (native, $(BUILD_TYPE))"
 	@$(CMAKE) -B $(LINUX_BUILD_DIR) \
@@ -117,6 +152,13 @@ windows: copy-third-party-windows
 		-DCMAKE_BUILD_TYPE=$(BUILD_TYPE) \
 		-DCMAKE_TOOLCHAIN_FILE=$(TOOLCHAIN_DIR)/x86_64-w64-mingw32.cmake
 	@$(CMAKE) --build $(WINDOWS_BUILD_DIR) --parallel
+
+macos: copy-third-party-macos
+	@echo "==> Building Macos (native, $(BUILD_TYPE))"
+	@$(CMAKE) -B $(MACOS_BUILD_DIR) \
+		-G Ninja \
+		-DCMAKE_BUILD_TYPE=$(BUILD_TYPE)
+	@$(CMAKE) --build $(MACOS_BUILD_DIR) --parallel
 
 go:
 	@echo "==> Building Go module with source (verify compilation)"

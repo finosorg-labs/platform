@@ -53,7 +53,7 @@ func TestSIMDDetect(t *testing.T) {
 	level := DetectSIMD()
 	t.Logf("Detected SIMD level: %s", level.String())
 
-	if level < SIMDScalar || level > SIMDAVX512 {
+	if level < SIMDScalar || level > SIMDNEON {
 		t.Errorf("Invalid SIMD level: %d", level)
 	}
 
