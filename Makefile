@@ -59,11 +59,10 @@ MACOS_THIRD_PARTY_DIR := $(MACOS_BUILD_DIR)/third_party
 .PHONY: all default linux windows macos go test bench clean verify help format
 .PHONY: qa qa-sanitizers qa-static
 .PHONY: sanitizer-asan sanitizer-usan sanitizer-tsan sanitizer-msan clang-tidy cppcheck
-.PHONY: copy-third-party-linux copy-third-party-windows copy-third-party-macos
 
-default: macos
+default: linux
 
-all: format linux windows macos go
+all: format linux go
 # TODO: Re-enable Windows build after building Windows-compatible GMP/MPFR libraries
 # all: format linux windows go
 
@@ -87,78 +86,33 @@ qa-sanitizers: sanitizer-asan sanitizer-usan sanitizer-tsan sanitizer-msan
 	@echo "==> All sanitizer checks completed"
 endif
 
-copy-third-party-linux:
-	@echo "==> Copying third-party libraries for Linux"
-	@mkdir -p $(LINUX_THIRD_PARTY_DIR)/gmp
-	@mkdir -p $(LINUX_THIRD_PARTY_DIR)/mpfr
-	@if [ -f $(GMP_SOURCE_LIB) ]; then \
-		cp $(GMP_SOURCE_LIB) $(LINUX_THIRD_PARTY_DIR)/gmp/; \
-		echo "  Copied GMP library to $(LINUX_THIRD_PARTY_DIR)/gmp/"; \
-	else \
-		echo "  WARNING: GMP library not found at $(GMP_SOURCE_LIB)"; \
-	fi
-	@if [ -f $(MPFR_SOURCE_LIB) ]; then \
-		cp $(MPFR_SOURCE_LIB) $(LINUX_THIRD_PARTY_DIR)/mpfr/; \
-		echo "  Copied MPFR library to $(LINUX_THIRD_PARTY_DIR)/mpfr/"; \
-	else \
-		echo "  WARNING: MPFR library not found at $(MPFR_SOURCE_LIB)"; \
-	fi
-
-copy-third-party-windows:
-	@echo "==> Copying third-party libraries for Windows"
-	@mkdir -p $(WINDOWS_THIRD_PARTY_DIR)/gmp
-	@mkdir -p $(WINDOWS_THIRD_PARTY_DIR)/mpfr
-	@if [ -f $(GMP_SOURCE_LIB) ]; then \
-		cp $(GMP_SOURCE_LIB) $(WINDOWS_THIRD_PARTY_DIR)/gmp/; \
-		echo "  Copied GMP library to $(WINDOWS_THIRD_PARTY_DIR)/gmp/"; \
-	else \
-		echo "  WARNING: GMP library not found at $(GMP_SOURCE_LIB)"; \
-	fi
-	@if [ -f $(MPFR_SOURCE_LIB) ]; then \
-		cp $(MPFR_SOURCE_LIB) $(WINDOWS_THIRD_PARTY_DIR)/mpfr/; \
-		echo "  Copied MPFR library to $(WINDOWS_THIRD_PARTY_DIR)/mpfr/"; \
-	else \
-		echo "  WARNING: MPFR library not found at $(MPFR_SOURCE_LIB)"; \
-	fi
-
-copy-third-party-macos:
-	@echo "==> Copying third-party libraries for macos"
-	@mkdir -p $(MACOS_THIRD_PARTY_DIR)/gmp
-	@mkdir -p $(MACOS_THIRD_PARTY_DIR)/mpfr
-	@if [ -f $(GMP_SOURCE_LIB) ]; then \
-		cp $(GMP_SOURCE_LIB) $(MACOS_THIRD_PARTY_DIR)/gmp/; \
-		echo "  Copied GMP library to $(MACOS_THIRD_PARTY_DIR)/gmp/"; \
-	else \
-		echo "  WARNING: GMP library not found at $(GMP_SOURCE_LIB)"; \
-	fi
-	@if [ -f $(MPFR_SOURCE_LIB) ]; then \
-		cp $(MPFR_SOURCE_LIB) $(MACOS_THIRD_PARTY_DIR)/mpfr/; \
-		echo "  Copied MPFR library to $(MACOS_THIRD_PARTY_DIR)/mpfr/"; \
-	else \
-		echo "  WARNING: MPFR library not found at $(MPFR_SOURCE_LIB)"; \
-	fi
-
-linux: copy-third-party-linux
+linux:
 	@echo "==> Building Linux (native, $(BUILD_TYPE))"
 	@$(CMAKE) -B $(LINUX_BUILD_DIR) \
 		-G Ninja \
 		-DCMAKE_BUILD_TYPE=$(BUILD_TYPE)
 	@$(CMAKE) --build $(LINUX_BUILD_DIR) --parallel
+	@echo "==> Cleaning intermediate build artifacts"
+	@rm -f $(LINUX_BUILD_DIR)/libfinkit_platform_static_base.a
 
-windows: copy-third-party-windows
+windows:
 	@echo "==> Building Windows amd64 (cross-compile, $(BUILD_TYPE))"
 	@$(CMAKE) -B $(WINDOWS_BUILD_DIR) \
 		-G Ninja \
 		-DCMAKE_BUILD_TYPE=$(BUILD_TYPE) \
 		-DCMAKE_TOOLCHAIN_FILE=$(TOOLCHAIN_DIR)/x86_64-w64-mingw32.cmake
 	@$(CMAKE) --build $(WINDOWS_BUILD_DIR) --parallel
+	@echo "==> Cleaning intermediate build artifacts"
+	@rm -f $(WINDOWS_BUILD_DIR)/libfinkit_platform_static_base.a
 
-macos: copy-third-party-macos
+macos:
 	@echo "==> Building Macos (native, $(BUILD_TYPE))"
 	@$(CMAKE) -B $(MACOS_BUILD_DIR) \
 		-G Ninja \
 		-DCMAKE_BUILD_TYPE=$(BUILD_TYPE)
 	@$(CMAKE) --build $(MACOS_BUILD_DIR) --parallel
+	@echo "==> Cleaning intermediate build artifacts"
+	@rm -f $(MACOS_BUILD_DIR)/libfinkit_platform_static_base.a
 
 go:
 	@echo "==> Building Go module with source (verify compilation)"

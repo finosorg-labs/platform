@@ -15,7 +15,9 @@ add_executable(platform_tests
 # Link with platform library
 target_link_libraries(platform_tests
     PRIVATE
-        finkit_platform_static
+        finkit_platform_static_base
+        ${FC_MPFR_STATIC_LIB}
+        ${FC_GMP_STATIC_LIB}
         m
 )
 

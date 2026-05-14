@@ -15,7 +15,7 @@ target_include_directories(bench_framework
 
 target_link_libraries(bench_framework
     PUBLIC
-        finkit_platform_static
+        finkit_platform_static_base
 )
 
 # Benchmark executable
@@ -28,7 +28,9 @@ add_executable(platform_benchmarks
 target_link_libraries(platform_benchmarks
     PRIVATE
         bench_framework
-        finkit_platform_static
+        finkit_platform_static_base
+        ${FC_MPFR_STATIC_LIB}
+        ${FC_GMP_STATIC_LIB}
         m
 )
 

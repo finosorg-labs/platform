@@ -7,8 +7,8 @@
 
 #include "platform.h"
 
-#include <sys/types.h>
 #include <sys/sysctl.h>
+#include <sys/types.h>
 
 /*
  * Cache size retrieval using sysctl
