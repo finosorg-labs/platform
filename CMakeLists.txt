@@ -120,8 +120,22 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
         COMMENT "Merging static libraries into ${MERGED_LIB_PATH}"
         VERBATIM
     )
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    # macOS: use libtool to merge libraries (suppress expected duplicate member warnings)
+    add_custom_command(
+        OUTPUT ${MERGED_LIB_PATH}
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_SOURCE_DIR}/build/${PLATFORM_BUILD_DIR}
+        COMMAND libtool -static -o ${MERGED_LIB_PATH}
+            $<TARGET_FILE:finkit_platform_static_base>
+            ${FC_GMP_STATIC_LIB}
+            ${FC_MPFR_STATIC_LIB}
+            2>&1 | grep -v "warning duplicate member name" || true
+        DEPENDS finkit_platform_static_base ${FC_GMP_STATIC_LIB} ${FC_MPFR_STATIC_LIB}
+        COMMENT "Merging static libraries into ${MERGED_LIB_PATH}"
+        VERBATIM
+    )
 else()
-    # Unix/Linux/macOS: use ar with MRI script to merge libraries
+    # Linux: use ar with MRI script to merge libraries
     set(MRI_SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/merge_libs.mri)
     file(GENERATE OUTPUT ${MRI_SCRIPT} CONTENT
 "CREATE ${MERGED_LIB_PATH}
